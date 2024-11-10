@@ -1,36 +1,3 @@
-// import './App.scss'
-// import '@styles/examplePage.scss'
-
-// import { useStateTogether } from 'react-together'
-
-// import { version } from '@package'
-// import { HeroLogo } from '@components'
-
-// export default function App() {
-//   const [count, set_count] = useStateTogether('counter_0', 0)
-
-//   return (
-//     <div>
-//       <div>
-//         <HeroLogo {...{ type: 'reacttogether' }} />
-//         <HeroLogo {...{ type: 'react' }} />
-//         <HeroLogo {...{ type: 'vite' }} />
-//       </div>
-//       <h1>ReactTogether + Vite + React</h1>
-//       <div className='card'>
-//         <button onClick={() => set_count((count) => count + 1) }>Synq'd count is {count}</button>
-//         {/* <button onClick={() => set_count((count) => count + 1)}>Synq'd count is {count}</button> */}
-//         <button {...{ style: { marginLeft: '1rem' }, onClick: () => set_count(0) }}>Reset</button>
-//       </div>
-//       <p className='read-the-docs'>Click on the respective logos to learn more.</p>
-
-//       <div className='version-num'>{version}</div>
-//     </div>
-//   )
-// }
-
-import './App.scss'
-import '@styles/examplePage.scss'
 import './index.css'
 
 const items = [
@@ -47,22 +14,22 @@ const items = [
 
 export default function App() {
   return (
-    <div className='container mx-auto p-8'>
-      <h1 className='text-3xl font-bold mb-8 text-center'>Shopping Items</h1>
-
-      <div className='grid grid-cols-3 gap-6'>
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className='border-2 border-gray-300 rounded-lg p-4 h-48 flex flex-col justify-between hover:border-blue-500 transition-colors'
-          >
-            <div className='h-24 bg-gray-200 rounded-md mb-2'></div>
-            <div>
-              <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
-              <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+    <div className='min-h-screen bg-white py-16 px-8'>
+      <div className='max-w-3xl mx-auto'>
+        <div className='grid grid-cols-3 gap-6'>
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className='aspect-square border-2 border-gray-300 rounded-lg p-4 flex flex-col justify-between hover:border-blue-500 transition-colors'
+            >
+              <div className='h-32 bg-gray-200 rounded-md mb-2'></div>
+              <div>
+                <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
+                <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
