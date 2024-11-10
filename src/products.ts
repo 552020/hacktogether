@@ -5,7 +5,7 @@ export interface Product {
   colors: string[]
   sizes: number[]
   image: string
-  soldOut?: boolean
+  highlight?: string
   inStock?: boolean
 }
 
@@ -18,6 +18,7 @@ export const products: Product[] = [
     sizes: [1, 2, 3, 4, 5, 6],
     image: '/src/assets/images/exhaust.png',
     inStock: true,
+    highlight: 'Great stuff',
   },
   {
     id: 2,
@@ -44,6 +45,24 @@ export const products: Product[] = [
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
     image: '/src/assets/images/trash.png',
+    inStock: true,
+  },
+  {
+    id: 5,
+    name: 'EXTINCTOR',
+    price: 189,
+    colors: ['asphalt'],
+    sizes: [1, 2, 3, 4, 5, 6],
+    image: '/src/assets/images/extinctor.png',
+    inStock: true,
+  },
+  {
+    id: 6,
+    name: 'TABLE',
+    price: 189,
+    colors: ['asphalt'],
+    sizes: [1, 2, 3, 4, 5, 6],
+    image: '/src/assets/images/table.png',
     inStock: true,
   },
 ]
