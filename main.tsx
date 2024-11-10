@@ -20,16 +20,6 @@ console.log('🔧 React Together Configuration:', {
   sessionPassword: config.sessionPassword ? '****' : undefined,
 })
 
-// Validate required fields
-const missingFields = Object.entries(config)
-  .filter(([_, value]) => !value)
-  .map(([key]) => key)
-
-if (missingFields.length > 0) {
-  console.error('❌ Missing required environment variables:', missingFields)
-  throw new Error(`Missing required environment variables: ${missingFields.join(', ')}`)
-}
-
 try {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -46,6 +36,11 @@ try {
         onConnect={() => {
           console.log('✅ React Together Connected Successfully')
         }}
+        onDisconnect={(reason) => {
+          console.log('⚠️ React Together Disconnected:', reason)
+        }}
+        connectionTimeout={10000} // 10 seconds timeout
+        fallbackToOffline={true} // Allow offline mode if connection fails
       >
         <App />
       </ReactTogether>
