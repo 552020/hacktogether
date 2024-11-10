@@ -4,6 +4,7 @@ import './index.css'
 import { useMyId, useStateTogetherWithPerUserValues } from 'react-together'
 import { useState, useEffect } from 'react'
 import UserProfile from './components/UserProfile'
+import { products } from './products'
 
 interface ChatMessage {
   from: string
@@ -17,18 +18,6 @@ interface UserStatus {
   lastSeen: number
 }
 
-const items = [
-  { id: 1, title: 'Item 1', price: '$99' },
-  { id: 2, title: 'Item 2', price: '$149' },
-  { id: 3, title: 'Item 3', price: '$199' },
-  { id: 4, title: 'Item 4', price: '$299' },
-  { id: 5, title: 'Item 5', price: '$399' },
-  { id: 6, title: 'Item 6', price: '$499' },
-  { id: 7, title: 'Item 7', price: '$599' },
-  { id: 8, title: 'Item 8', price: '$699' },
-  { id: 9, title: 'Item 9', price: '$799' },
-]
-
 export default function App() {
   const myId = useMyId()
   const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
@@ -40,6 +29,9 @@ export default function App() {
   })
   const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, number>>({})
+  const [selectedColors, setSelectedColors] = useState<Record<number, string>>({})
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
 
   useEffect(() => {
     setStatus({ online: true, lastSeen: Date.now() })
@@ -86,82 +78,119 @@ export default function App() {
   }
 
   return (
-    <div className='relative min-h-screen' onMouseMove={handleMouseMove}>
-      {/* User cursors */}
-      {Object.entries(positionsPerUser).map(([userId, userPosition]) => (
-        <div
-          key={userId}
-          style={{
-            position: 'fixed',
-            left: `calc(50% + ${userPosition.x}vw)`,
-            top: `calc(50% + ${userPosition.y}vh)`,
-            zIndex: 50,
-          }}
-        >
-          <div
-            className={`w-4 h-4 rounded-full ${userId === myId ? 'bg-red-500' : 'bg-blue-500'}`}
-            style={{ transform: 'translate(-50%, -50%)' }}
-          />
-          <div className='text-xs mt-1 bg-black text-white px-2 py-1 rounded whitespace-nowrap'>
-            User {userId === myId ? '(You)' : userId}
+    <div className='flex min-h-screen bg-background text-foreground font-mono' onMouseMove={handleMouseMove}>
+      <main className='flex-1 p-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-12'>
+          {/* Product Image Grid */}
+          <div className='grid grid-cols-2 gap-4 h-fit'>
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className='aspect-square relative group'
+                onMouseEnter={() => setHoveredProduct(product.id)}
+                onMouseLeave={() => setHoveredProduct(null)}
+              >
+                <img src={product.image} alt={product.name} className='object-cover w-full h-full' />
+                <div
+                  className={`absolute inset-0 bg-black/40 transition-opacity ${
+                    hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Product Details List */}
+          <div className='space-y-8'>
+            {products.map((product) => (
+              <div key={product.id} className='border-t border-border pt-4'>
+                <div className='flex justify-between items-start'>
+                  <div>
+                    <h3 className='text-sm'>
+                      {product.id}. {product.name}
+                    </h3>
+                    <div className='flex gap-2 mt-1'>
+                      {product.colors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setSelectedColors({ ...selectedColors, [product.id]: color })}
+                          className={`text-xs hover:underline ${selectedColors[product.id] === color ? 'underline' : ''}`}
+                        >
+                          ●{color}
+                        </button>
+                      ))}
+                    </div>
+                    <div className='flex gap-2 mt-1'>
+                      {product.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSizes({ ...selectedSizes, [product.id]: size })}
+                          className={`text-xs hover:underline ${selectedSizes[product.id] === size ? 'underline' : ''}`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className='text-right'>
+                    <span className='text-sm'>${product.price}</span>
+                    <button className='block mt-1 text-xs hover:underline'>{product.inStock ? 'add to cart' : 'sold out'}</button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      </main>
 
-      {/* Users List Box */}
-      <div className='fixed bottom-4 right-4 w-64 bg-white rounded-lg shadow-lg overflow-hidden z-50'>
-        <div className='bg-blue-500 text-white p-3'>
-          <h2 className='text-sm font-bold'>Users Near You ({activeUsers.length})</h2>
+      {/* Navigation Sidebar */}
+      <nav className='w-48 border-l border-border p-6 space-y-6'>
+        <div className='space-y-2'>
+          <button className='block text-sm hover:underline'>home</button>
+          <button className='block text-sm hover:underline'>about</button>
+          <button className='block text-sm hover:underline'>services</button>
         </div>
-        <div className='max-h-48 overflow-y-auto'>
+
+        <div className='space-y-2'>
+          <h4 className='text-sm'>sort by</h4>
+          <button className='text-sm hover:underline'>A-Z</button>
+          <button className='text-sm hover:underline'>CHRON</button>
+          <button className='text-sm hover:underline'>PRICE</button>
+        </div>
+
+        {/* Users Section */}
+        <div className='space-y-2'>
+          <h4 className='text-sm'>users ({activeUsers.length})</h4>
           {activeUsers.map((userId) => (
-            <div key={userId} className='w-full text-left p-2 hover:bg-gray-100 text-sm border-b'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center space-x-2'>
-                  <div className='w-2 h-2 rounded-full bg-green-500'></div>
-                  <span>User {userId}</span>
-                </div>
-                <div className='flex space-x-2'>
-                  <button
-                    onClick={() => {
-                      setSelectedUser(userId)
-                      setIsChatOpen(true)
-                    }}
-                    className='text-blue-500 hover:text-blue-700'
-                  >
-                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedUser(userId)
-                      setIsProfileOpen(true)
-                    }}
-                    className='text-blue-500 hover:text-blue-700'
-                  >
-                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-                      />
-                    </svg>
-                  </button>
-                </div>
+            <div key={userId} className='flex items-center justify-between text-sm'>
+              <span>user {userId}</span>
+              <div className='flex gap-2'>
+                <button
+                  className='text-xs hover:underline'
+                  onClick={() => {
+                    setSelectedUser(userId)
+                    setIsChatOpen(true)
+                  }}
+                >
+                  chat
+                </button>
+                <span className='text-xs'>·</span>
+                <button
+                  className='text-xs hover:underline'
+                  onClick={() => {
+                    setSelectedUser(userId)
+                    setIsProfileOpen(true)
+                  }}
+                >
+                  profile
+                </button>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </nav>
 
-      {/* Chat Popup */}
+      {/* Chat and Profile modals */}
       {selectedUser && isChatOpen && (
         <div className='fixed bottom-4 right-72 w-80 h-96 bg-white rounded-lg shadow-lg flex flex-col z-50'>
           <div className='bg-blue-500 text-white p-3 flex justify-between items-center'>
@@ -211,26 +240,6 @@ export default function App() {
           </form>
         </div>
       )}
-
-      {/* Replace original content with items grid */}
-      <div className='min-h-screen bg-white py-16 px-8'>
-        <div className='max-w-3xl mx-auto'>
-          <div className='grid grid-cols-3 gap-6'>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className='aspect-square border-2 border-gray-300 rounded-lg p-4 flex flex-col justify-between hover:border-blue-500 transition-colors'
-              >
-                <div className='h-32 bg-gray-200 rounded-md mb-2'></div>
-                <div>
-                  <div className='h-4 bg-gray-200 rounded w-3/4 mb-2'></div>
-                  <div className='h-4 bg-gray-200 rounded w-1/2'></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {selectedUser && isProfileOpen && (
         <UserProfile userId={selectedUser} isCurrentUser={selectedUser === myId} onClose={() => setIsProfileOpen(false)} />
