@@ -1,7 +1,4 @@
-import croquet from './croquet.yaml'
+const appId = import.meta.env.VITE_APP_ID
+const apiKey = import.meta.env.VITE_API_KEY
 
-const { appId, apiKey } = croquet
-
-export { 
-  appId, apiKey,
-}
+export { appId, apiKey }
