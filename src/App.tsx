@@ -71,14 +71,33 @@ export default function App() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = (e.clientX / window.innerWidth) * 100 - 50
-    const y = (e.clientY / window.innerHeight) * 100 - 50
-
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
     setPosition({ x, y })
   }
 
   return (
     <div className='flex min-h-screen bg-background text-foreground font-mono' onMouseMove={handleMouseMove}>
+      {/* Cursor tracking */}
+      {Object.entries(positionsPerUser).map(([userId, pos]) => (
+        <div
+          key={userId}
+          style={{
+            position: 'fixed',
+            left: `${pos.x}%`,
+            top: `${pos.y}%`,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: 50,
+          }}
+        >
+          <div className={`w-4 h-4 rounded-full ${userId === myId ? 'bg-red-500' : 'bg-blue-500'}`} />
+          <div className='text-xs mt-1 bg-black text-white px-2 py-1 rounded whitespace-nowrap'>
+            user {userId === myId ? '(you)' : userId}
+          </div>
+        </div>
+      ))}
+
       <main className='flex-1 p-6'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-12'>
           {/* Product Image Grid */}
@@ -86,11 +105,22 @@ export default function App() {
             {products.map((product) => (
               <div
                 key={product.id}
-                className='aspect-square relative group'
+                className={`relative group ${product.id === 1 || product.id === 4 ? 'col-span-2' : ''}`}
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
               >
-                <img src={product.image} alt={product.name} className='object-cover w-full h-full' />
+                <div className='aspect-square flex items-center justify-center'>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    style={{
+                      width: '25%',
+                      height: 'auto',
+                      display: 'block',
+                    }}
+                    className='object-contain'
+                  />
+                </div>
                 <div
                   className={`absolute inset-0 bg-black/40 transition-opacity ${
                     hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'
