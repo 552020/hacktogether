@@ -16,7 +16,7 @@ export const products: Product[] = [
     price: 79,
     colors: ['vintage black'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/exhaust.png',
+    image: '/images/exhaust.png',
     inStock: true,
     highlight: 'Great stuff',
   },
@@ -26,7 +26,7 @@ export const products: Product[] = [
     price: 189,
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/shoe.png',
+    image: '/images/shoe.png',
     inStock: true,
   },
   {
@@ -35,7 +35,7 @@ export const products: Product[] = [
     price: 189,
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/stefano.png',
+    image: '/images/stefano.png',
     inStock: true,
   },
   {
@@ -44,7 +44,7 @@ export const products: Product[] = [
     price: 189,
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/trash.png',
+    image: '/images/trash.png',
     inStock: true,
   },
   {
@@ -53,7 +53,7 @@ export const products: Product[] = [
     price: 189,
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/extinctor.png',
+    image: '/images/extinctor.png',
     inStock: true,
   },
   {
@@ -62,7 +62,7 @@ export const products: Product[] = [
     price: 189,
     colors: ['asphalt'],
     sizes: [1, 2, 3, 4, 5, 6],
-    image: '/src/assets/images/table.png',
+    image: '/images/table.png',
     inStock: true,
   },
 ]
