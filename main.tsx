@@ -15,24 +15,19 @@ const config = {
 // Debug logging
 console.log('🔧 React Together Configuration:', {
   appId: config.appId,
-  apiKey: config.apiKey ? '****' + config.apiKey.slice(-4) : undefined, // Show only last 4 chars of API key
+  apiKey: config.apiKey ? '****' + config.apiKey.slice(-4) : undefined,
   sessionName: config.sessionName,
   sessionPassword: config.sessionPassword ? '****' : undefined,
 })
 
 // Validate required fields
 const missingFields = Object.entries(config)
-  .filter(([key, value]) => !value)
+  .filter(([_, value]) => !value)
   .map(([key]) => key)
 
 if (missingFields.length > 0) {
   console.error('❌ Missing required environment variables:', missingFields)
   throw new Error(`Missing required environment variables: ${missingFields.join(', ')}`)
-}
-
-// Additional validation for appId format
-if (!config.appId.startsWith('dev.reacttogether.')) {
-  console.warn('⚠️ APP_ID should start with "dev.reacttogether."')
 }
 
 try {
