@@ -63,13 +63,24 @@ export default function App() {
   const [currentSection, setCurrentSection] = useState<Section>(null)
 
   useEffect(() => {
+    // Set initial online status
     setStatus({ online: true, lastSeen: Date.now() })
+
+    // Set up interval for regular updates
     const interval = setInterval(() => {
       setStatus({ online: true, lastSeen: Date.now() })
     }, 5000)
-    return () => {
+
+    // Handle user leaving/closing the page
+    const handleBeforeUnload = () => {
       setStatus({ online: false, lastSeen: Date.now() })
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    // Cleanup
+    return () => {
       clearInterval(interval)
+      window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [setStatus])
 
