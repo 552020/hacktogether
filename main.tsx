@@ -14,12 +14,12 @@ document.addEventListener('securitypolicyviolation', (e) => {
   })
 })
 
-// Validate environment variables
+// Hardcoded configuration instead of environment variables
 const config = {
-  appId: import.meta.env.VITE_APP_ID,
-  apiKey: import.meta.env.VITE_API_KEY,
-  sessionName: import.meta.env.VITE_SESSION_NAME,
-  sessionPassword: import.meta.env.VITE_SESSION_PASSWORD,
+  appId: 'dev.reacttogether.hacktogether',
+  apiKey: '2m8V3gb2hYZ54JrEfXnFDhyJsJtTIOEyxkN3x2mPBx',
+  sessionName: 'My Session',
+  sessionPassword: '123456',
 }
 
 // Debug logging
