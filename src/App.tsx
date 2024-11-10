@@ -76,9 +76,8 @@ export default function App() {
     .sort((a, b) => a.timestamp - b.timestamp)
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect()
     setPosition({
-      x: e.clientX - rect.left,
+      x: e.clientX,
       y: e.clientY,
     })
   }
