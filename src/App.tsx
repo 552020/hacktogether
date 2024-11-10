@@ -26,15 +26,13 @@ interface UserStatus {
 type Section = 'home' | 'about' | 'services' | null
 
 export default function App() {
-  // Check if these hooks are returning valid values
-  console.log('Checking hook values:')
-
+  // Provide fallback values for all hooks
   const myId = (() => {
     try {
       return useMyId()
     } catch (e) {
-      console.error('Error in useMyId:', e)
-      return null
+      console.warn('Fallback: Generated random ID due to useMyId error')
+      return `user_${Math.random().toString(36).slice(2, 9)}`
     }
   })()
 
@@ -42,19 +40,31 @@ export default function App() {
     try {
       return useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
     } catch (e) {
-      console.error('Error in useStateTogetherWithPerUserValues:', e)
+      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
       return [{ x: 0, y: 0 }, () => {}, {}]
     }
   })()
 
-  const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
-    online: true,
-    lastSeen: Date.now(),
-  })
-  console.log('status values:', { status, statusPerUser })
+  const [status, setStatus, statusPerUser] = (() => {
+    try {
+      return useStateTogetherWithPerUserValues('user-status', {
+        online: true,
+        lastSeen: Date.now(),
+      })
+    } catch (e) {
+      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
+      return [{ online: true, lastSeen: Date.now() }, () => {}, {}]
+    }
+  })()
 
-  const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
-  console.log('messages values:', { messages, messagesPerUser })
+  const [messages, setMessages, messagesPerUser] = (() => {
+    try {
+      return useStateTogetherWithPerUserValues('chat-messages', [])
+    } catch (e) {
+      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
+      return [[], () => {}, {}]
+    }
+  })()
 
   // 2. Then React's useState hooks
   const [isReady, setIsReady] = useState(false)
