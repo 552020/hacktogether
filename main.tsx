@@ -40,17 +40,6 @@ try {
           name: config.sessionName,
           password: config.sessionPassword,
         }}
-        onError={(error) => {
-          console.error('❌ React Together Error:', error)
-        }}
-        onConnect={() => {
-          console.log('✅ React Together Connected Successfully')
-        }}
-        onDisconnect={(reason) => {
-          console.log('⚠️ React Together Disconnected:', reason)
-        }}
-        connectionTimeout={10000} // 10 seconds timeout
-        fallbackToOffline={true} // Allow offline mode if connection fails
       >
         <App />
       </ReactTogether>

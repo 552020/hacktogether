@@ -26,14 +26,58 @@ interface UserStatus {
 type Section = 'home' | 'about' | 'services' | null
 
 export default function App() {
-  const myId = useMyId()
-  const [isReady, setIsReady] = useState(false)
+  // Check if these hooks are returning valid values
+  console.log('Checking hook values:')
 
+  const myId = useMyId()
+  console.log('myId:', myId)
+
+  const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
+  console.log('position values:', { position, positionsPerUser })
+
+  const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
+    online: true,
+    lastSeen: Date.now(),
+  })
+  console.log('status values:', { status, statusPerUser })
+
+  const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
+  console.log('messages values:', { messages, messagesPerUser })
+
+  // 2. Then React's useState hooks
+  const [isReady, setIsReady] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [selectedSizes, setSelectedSizes] = useState<Record<number, number>>({})
+  const [selectedColors, setSelectedColors] = useState<Record<number, string>>({})
+  const [currentSection, setCurrentSection] = useState<Section>(null)
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
+  const [selectedImage, setSelectedImage] = useState<number | null>(null)
+
+  // 3. Then useEffect hooks
   useEffect(() => {
     if (myId) {
       setIsReady(true)
     }
   }, [myId])
+
+  useEffect(() => {
+    setStatus({ online: true, lastSeen: Date.now() })
+    const interval = setInterval(() => {
+      setStatus({ online: true, lastSeen: Date.now() })
+    }, 5000)
+
+    const handleBeforeUnload = () => {
+      setStatus({ online: false, lastSeen: Date.now() })
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [setStatus])
 
   // Show loading state while connecting
   if (!isReady) {
@@ -46,43 +90,6 @@ export default function App() {
       </div>
     )
   }
-
-  const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
-    online: true,
-    lastSeen: Date.now(),
-  })
-  const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, number>>({})
-  const [selectedColors, setSelectedColors] = useState<Record<number, string>>({})
-  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
-  const [selectedImage, setSelectedImage] = useState<number | null>(null)
-  const [currentSection, setCurrentSection] = useState<Section>(null)
-
-  useEffect(() => {
-    // Set initial online status
-    setStatus({ online: true, lastSeen: Date.now() })
-
-    // Set up interval for regular updates
-    const interval = setInterval(() => {
-      setStatus({ online: true, lastSeen: Date.now() })
-    }, 5000)
-
-    // Handle user leaving/closing the page
-    const handleBeforeUnload = () => {
-      setStatus({ online: false, lastSeen: Date.now() })
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    // Cleanup
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [setStatus])
 
   const sendMessage = (text: string) => {
     if (!selectedUser) return
