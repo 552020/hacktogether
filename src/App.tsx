@@ -26,61 +26,7 @@ interface UserStatus {
 type Section = 'home' | 'about' | 'services' | null
 
 export default function App() {
-  const [isConnected, setIsConnected] = useState(false)
-
-  useEffect(() => {
-    // Give some time for the connection to establish
-    const timer = setTimeout(() => {
-      setIsConnected(true)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (!isConnected) {
-    return <div>Connecting...</div>
-  }
-
-  // Only try to use hooks after connection is established
-  const myId = (() => {
-    try {
-      return useMyId()
-    } catch (e) {
-      console.warn('Fallback: Generated random ID due to useMyId error')
-      return `user_${Math.random().toString(36).slice(2, 9)}`
-    }
-  })()
-
-  const [position, setPosition, positionsPerUser] = (() => {
-    try {
-      return useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
-    } catch (e) {
-      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
-      return [{ x: 0, y: 0 }, () => {}, {}]
-    }
-  })()
-
-  const [status, setStatus, statusPerUser] = (() => {
-    try {
-      return useStateTogetherWithPerUserValues('user-status', {
-        online: true,
-        lastSeen: Date.now(),
-      })
-    } catch (e) {
-      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
-      return [{ online: true, lastSeen: Date.now() }, () => {}, {}]
-    }
-  })()
-
-  const [messages, setMessages, messagesPerUser] = (() => {
-    try {
-      return useStateTogetherWithPerUserValues('chat-messages', [])
-    } catch (e) {
-      console.warn('Fallback: Using local state due to useStateTogetherWithPerUserValues error')
-      return [[], () => {}, {}]
-    }
-  })()
-
-  // 2. Then React's useState hooks
+  // 1. First, all useState hooks
   const [isReady, setIsReady] = useState(false)
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [isChatOpen, setIsChatOpen] = useState(false)
@@ -88,43 +34,29 @@ export default function App() {
   const [selectedSizes, setSelectedSizes] = useState<Record<number, number>>({})
   const [selectedColors, setSelectedColors] = useState<Record<number, string>>({})
   const [currentSection, setCurrentSection] = useState<Section>(null)
-  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
   const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
 
-  // 3. Then useEffect hooks
+  // 2. Then useEffect
   useEffect(() => {
-    if (myId) {
-      setIsReady(true)
-    }
-  }, [myId])
+    const timer = setTimeout(() => setIsReady(true), 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
-  useEffect(() => {
-    setStatus({ online: true, lastSeen: Date.now() })
-    const interval = setInterval(() => {
-      setStatus({ online: true, lastSeen: Date.now() })
-    }, 5000)
+  // 3. Then all React Together hooks
+  const myId = useMyId()
 
-    const handleBeforeUnload = () => {
-      setStatus({ online: false, lastSeen: Date.now() })
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
+  const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
 
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [setStatus])
+  const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
+    online: true,
+    lastSeen: Date.now(),
+  })
 
-  // Show loading state while connecting
+  const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
+
   if (!isReady) {
-    return (
-      <div className='flex justify-center items-center h-screen bg-background text-foreground font-mono'>
-        <div className='text-center'>
-          <img src={cartoonLogo} alt='Cartoon Logo' className='w-24 h-24 mx-auto mb-4' />
-          <p>Connecting to session...</p>
-        </div>
-      </div>
-    )
+    return <div>Loading...</div>
   }
 
   const sendMessage = (text: string) => {
