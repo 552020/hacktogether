@@ -4,6 +4,16 @@ import { createRoot } from 'react-dom/client'
 import { ReactTogether } from 'react-together'
 import App from '@/App'
 
+document.addEventListener('securitypolicyviolation', (e) => {
+  console.log('🚫 CSP Violation Details:', {
+    blockedURI: e.blockedURI,
+    violatedDirective: e.violatedDirective,
+    sourceFile: e.sourceFile,
+    lineNumber: e.lineNumber,
+    columnNumber: e.columnNumber,
+  })
+})
+
 // Validate environment variables
 const config = {
   appId: import.meta.env.VITE_APP_ID,
