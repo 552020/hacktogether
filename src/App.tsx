@@ -76,10 +76,11 @@ export default function App() {
     .sort((a, b) => a.timestamp - b.timestamp)
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    setPosition({
-      x: e.clientX,
-      y: e.clientY,
-    })
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX / window.innerWidth) * 100 - 50
+    const y = (e.clientY / window.innerHeight) * 100 - 50
+
+    setPosition({ x, y })
   }
 
   return (
@@ -90,8 +91,8 @@ export default function App() {
           key={userId}
           style={{
             position: 'fixed',
-            left: userPosition.x,
-            top: userPosition.y,
+            left: `calc(50% + ${userPosition.x}vw)`,
+            top: `calc(50% + ${userPosition.y}vh)`,
             zIndex: 50,
           }}
         >
