@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import UserProfile from './components/UserProfile'
 import { products } from './products'
 import { motion, AnimatePresence } from 'framer-motion'
+import cartoonLogo from './assets/images/logo/cartoon.gif'
 
 interface ChatMessage {
   from: string
@@ -171,7 +172,9 @@ export default function App() {
 
         {/* Navigation Menu */}
         <nav className='w-48 border-l border-border p-6 flex flex-col justify-center relative'>
+          <div className='absolute top-4 left-1/2 -translate-x-1/2 z-50'></div>
           <div className='space-y-6'>
+            <img src={cartoonLogo} alt='Cartoon Logo' className='w-34 h-34 object-contain' />
             <div className='space-y-2'>
               <span className='block text-sm font-bold cursor-pointer hover:underline'>home</span>
               <span

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@croquet/croquet": "^2.0.0-40",
+    "croquet": "^0.1.7-lerna.0",
     "framer-motion": "^11.11.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
