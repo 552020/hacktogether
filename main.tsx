@@ -22,33 +22,36 @@ const config = {
   sessionPassword: '123456',
 }
 
-// Initialize React Together before rendering
-console.log('Initializing React Together with config:', {
-  appId: config.appId,
-  apiKey: '****' + config.apiKey.slice(-4),
-  sessionName: config.sessionName,
-})
-
-// Wait for everything to be ready
-window.addEventListener('load', () => {
-  const root = document.getElementById('root')
-  if (!root) {
-    console.error('Root element not found')
+// Make sure the DOM is fully loaded
+const mountApp = () => {
+  const rootElement = document.getElementById('root')
+  if (!rootElement) {
+    console.error('Root element not found, retrying in 100ms...')
+    setTimeout(mountApp, 100)
     return
   }
 
-  createRoot(root).render(
-    <StrictMode>
-      <ReactTogether
-        sessionParams={{
-          appId: config.appId,
-          apiKey: config.apiKey,
-          name: config.sessionName,
-          password: config.sessionPassword,
-        }}
-      >
-        <App />
-      </ReactTogether>
-    </StrictMode>
-  )
-})
+  try {
+    const root = createRoot(rootElement)
+    root.render(
+      <StrictMode>
+        <ReactTogether
+          sessionParams={{
+            appId: config.appId,
+            apiKey: config.apiKey,
+            name: config.sessionName,
+            password: config.sessionPassword,
+          }}
+        >
+          <App />
+        </ReactTogether>
+      </StrictMode>
+    )
+    console.log('🚀 App mounted successfully')
+  } catch (error) {
+    console.error('❌ Error mounting app:', error)
+  }
+}
+
+// Start mounting process
+mountApp()
