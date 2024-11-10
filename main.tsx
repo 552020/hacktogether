@@ -14,7 +14,7 @@ document.addEventListener('securitypolicyviolation', (e) => {
   })
 })
 
-// Hardcoded configuration instead of environment variables
+// Hardcoded configuration
 const config = {
   appId: 'dev.reacttogether.hacktogether',
   apiKey: '2m8V3gb2hYZ54JrEfXnFDhyJsJtTIOEyxkN3x2mPBx',
@@ -22,64 +22,33 @@ const config = {
   sessionPassword: '123456',
 }
 
-// Debug logging
-console.log('🔧 React Together Configuration:', {
+// Initialize React Together before rendering
+console.log('Initializing React Together with config:', {
   appId: config.appId,
-  apiKey: config.apiKey ? '****' + config.apiKey.slice(-4) : undefined,
+  apiKey: '****' + config.apiKey.slice(-4),
   sessionName: config.sessionName,
-  sessionPassword: config.sessionPassword ? '****' : undefined,
 })
 
-// Wrapper component to handle connection retries
-function RetryWrapper({ children }: { children: React.ReactNode }) {
-  const [retryCount, setRetryCount] = useState(0)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    if (error && retryCount < 3) {
-      const timer = setTimeout(() => {
-        setRetryCount((c) => c + 1)
-        setError(null)
-      }, 2000) // Retry every 2 seconds
-      return () => clearTimeout(timer)
-    }
-  }, [error, retryCount])
-
-  if (retryCount >= 3) {
-    return <div>Failed to connect after multiple attempts. Please refresh the page.</div>
-  }
-
-  try {
-    return children
-  } catch (e) {
-    setError(e as Error)
-    return <div>Connection error, retrying... ({retryCount + 1}/3)</div>
-  }
-}
-
-try {
+// Wait for everything to be ready
+window.addEventListener('load', () => {
   const root = document.getElementById('root')
   if (!root) {
-    throw new Error('Root element not found')
+    console.error('Root element not found')
+    return
   }
 
   createRoot(root).render(
     <StrictMode>
-      <RetryWrapper>
-        <ReactTogether
-          sessionParams={{
-            appId: config.appId,
-            apiKey: config.apiKey,
-            name: config.sessionName,
-            password: config.sessionPassword,
-          }}
-        >
-          <App />
-        </ReactTogether>
-      </RetryWrapper>
+      <ReactTogether
+        sessionParams={{
+          appId: config.appId,
+          apiKey: config.apiKey,
+          name: config.sessionName,
+          password: config.sessionPassword,
+        }}
+      >
+        <App />
+      </ReactTogether>
     </StrictMode>
   )
-  console.log('🚀 App Render Initiated')
-} catch (error) {
-  console.error('❌ Fatal Error:', error)
-}
+})
