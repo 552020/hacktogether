@@ -29,11 +29,23 @@ export default function App() {
   // Check if these hooks are returning valid values
   console.log('Checking hook values:')
 
-  const myId = useMyId()
-  console.log('myId:', myId)
+  const myId = (() => {
+    try {
+      return useMyId()
+    } catch (e) {
+      console.error('Error in useMyId:', e)
+      return null
+    }
+  })()
 
-  const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
-  console.log('position values:', { position, positionsPerUser })
+  const [position, setPosition, positionsPerUser] = (() => {
+    try {
+      return useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
+    } catch (e) {
+      console.error('Error in useStateTogetherWithPerUserValues:', e)
+      return [{ x: 0, y: 0 }, () => {}, {}]
+    }
+  })()
 
   const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
     online: true,
