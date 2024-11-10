@@ -7,8 +7,9 @@ import UserProfile from './components/UserProfile'
 import { products } from './products'
 import { motion, AnimatePresence } from 'framer-motion'
 import cartoonLogo from './assets/images/logo/cartoon.gif'
+import * as ReactTogether from 'react-together'
 
-console.log('Available exports from react-together:', require('react-together'))
+console.log('Available exports from react-together:', ReactTogether)
 
 interface ChatMessage {
   from: string
