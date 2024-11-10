@@ -55,6 +55,26 @@ export default function App() {
 
   const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
 
+  // Add this right after your existing useEffect
+  useEffect(() => {
+    // Update status every 5 seconds
+    const intervalId = setInterval(() => {
+      setStatus({
+        online: true,
+        lastSeen: Date.now(),
+      })
+    }, 5000)
+
+    // Set initial status
+    setStatus({
+      online: true,
+      lastSeen: Date.now(),
+    })
+
+    // Cleanup on unmount
+    return () => clearInterval(intervalId)
+  }, [setStatus])
+
   if (!isReady) {
     return <div>Loading...</div>
   }
