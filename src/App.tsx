@@ -161,7 +161,7 @@ export default function App() {
                   <div className='text-right'>
                     <span className='text-sm'>${product.price}</span>
                     <span className='block mt-1 text-xs cursor-pointer hover:underline'>
-                      {product.inStock ? 'add to cart' : 'sold out'}
+                      {product.inStock ? 'check it out' : 'sold out'}
                     </span>
                   </div>
                 </div>
