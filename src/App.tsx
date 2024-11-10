@@ -26,7 +26,21 @@ interface UserStatus {
 type Section = 'home' | 'about' | 'services' | null
 
 export default function App() {
-  // Provide fallback values for all hooks
+  const [isConnected, setIsConnected] = useState(false)
+
+  useEffect(() => {
+    // Give some time for the connection to establish
+    const timer = setTimeout(() => {
+      setIsConnected(true)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!isConnected) {
+    return <div>Connecting...</div>
+  }
+
+  // Only try to use hooks after connection is established
   const myId = (() => {
     try {
       return useMyId()
