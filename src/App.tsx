@@ -8,6 +8,8 @@ import { products } from './products'
 import { motion, AnimatePresence } from 'framer-motion'
 import cartoonLogo from './assets/images/logo/cartoon.gif'
 
+console.log('Available exports from react-together:', require('react-together'))
+
 interface ChatMessage {
   from: string
   to: string
@@ -24,6 +26,26 @@ type Section = 'home' | 'about' | 'services' | null
 
 export default function App() {
   const myId = useMyId()
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    if (myId) {
+      setIsReady(true)
+    }
+  }, [myId])
+
+  // Show loading state while connecting
+  if (!isReady) {
+    return (
+      <div className='flex justify-center items-center h-screen bg-background text-foreground font-mono'>
+        <div className='text-center'>
+          <img src={cartoonLogo} alt='Cartoon Logo' className='w-24 h-24 mx-auto mb-4' />
+          <p>Connecting to session...</p>
+        </div>
+      </div>
+    )
+  }
+
   const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
   const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const [isChatOpen, setIsChatOpen] = useState(false)
