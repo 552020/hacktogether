@@ -5,7 +5,7 @@ import { ReactTogether } from 'react-together'
 import App from '@/App'
 
 document.addEventListener('securitypolicyviolation', (e) => {
-  console.log('🚫 CSP Violation Details:', {
+  console.log('🚫 CSP Violation Details from main.tsx:', {
     blockedURI: e.blockedURI,
     violatedDirective: e.violatedDirective,
     sourceFile: e.sourceFile,
