@@ -2,6 +2,19 @@ import './App.scss'
 import '@styles/examplePage.scss'
 import './index.css'
 import { useMyId, useStateTogetherWithPerUserValues } from 'react-together'
+import { useState, useEffect } from 'react'
+
+interface ChatMessage {
+  from: string
+  to: string
+  text: string
+  timestamp: number
+}
+
+interface UserStatus {
+  online: boolean
+  lastSeen: number
+}
 
 const items = [
   { id: 1, title: 'Item 1', price: '$99' },
@@ -18,6 +31,49 @@ const items = [
 export default function App() {
   const myId = useMyId()
   const [position, setPosition, positionsPerUser] = useStateTogetherWithPerUserValues('user-positions', { x: 0, y: 0 })
+  const [selectedUser, setSelectedUser] = useState<string | null>(null)
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const [status, setStatus, statusPerUser] = useStateTogetherWithPerUserValues<UserStatus>('user-status', {
+    online: true,
+    lastSeen: Date.now(),
+  })
+  const [messages, setMessages, messagesPerUser] = useStateTogetherWithPerUserValues<ChatMessage[]>('chat-messages', [])
+
+  useEffect(() => {
+    setStatus({ online: true, lastSeen: Date.now() })
+    const interval = setInterval(() => {
+      setStatus({ online: true, lastSeen: Date.now() })
+    }, 5000)
+    return () => {
+      setStatus({ online: false, lastSeen: Date.now() })
+      clearInterval(interval)
+    }
+  }, [setStatus])
+
+  const sendMessage = (text: string) => {
+    if (!selectedUser) return
+    setMessages([
+      ...messages,
+      {
+        from: myId,
+        to: selectedUser,
+        text,
+        timestamp: Date.now(),
+      },
+    ])
+  }
+
+  const activeUsers = Object.entries(statusPerUser)
+    .filter(([id, status]) => {
+      const isRecent = Date.now() - status.lastSeen < 10000
+      return id !== myId && status.online && isRecent
+    })
+    .map(([id]) => id)
+
+  const chatMessages = messages
+    .concat(messagesPerUser[selectedUser] || [])
+    .filter((msg) => (msg.from === myId && msg.to === selectedUser) || (msg.from === selectedUser && msg.to === myId))
+    .sort((a, b) => a.timestamp - b.timestamp)
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setPosition({
@@ -49,7 +105,80 @@ export default function App() {
         </div>
       ))}
 
-      {/* Original content */}
+      {/* Users List Box */}
+      <div className='fixed bottom-4 right-4 w-64 bg-white rounded-lg shadow-lg overflow-hidden z-50'>
+        <div className='bg-blue-500 text-white p-3'>
+          <h2 className='text-sm font-bold'>Users Near You ({activeUsers.length})</h2>
+        </div>
+        <div className='max-h-48 overflow-y-auto'>
+          {activeUsers.map((userId) => (
+            <button
+              key={userId}
+              onClick={() => {
+                setSelectedUser(userId)
+                setIsChatOpen(true)
+              }}
+              className='w-full text-left p-2 hover:bg-gray-100 text-sm border-b flex items-center space-x-2'
+            >
+              <div className='w-2 h-2 rounded-full bg-green-500'></div>
+              <span>User {userId}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Chat Popup */}
+      {selectedUser && isChatOpen && (
+        <div className='fixed bottom-4 right-72 w-80 h-96 bg-white rounded-lg shadow-lg flex flex-col z-50'>
+          <div className='bg-blue-500 text-white p-3 flex justify-between items-center'>
+            <h3 className='font-bold'>Chat with User {selectedUser}</h3>
+            <button onClick={() => setIsChatOpen(false)} className='text-white hover:text-gray-200'>
+              ×
+            </button>
+          </div>
+
+          <div className='flex-1 overflow-y-auto p-4 flex flex-col'>
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`mb-2 ${msg.from === myId ? 'ml-auto' : 'mr-auto'}`}>
+                <div
+                  className={`inline-block p-2 rounded-lg max-w-[80%] ${
+                    msg.from === myId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+                  }`}
+                >
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const input = e.currentTarget.elements.namedItem('message') as HTMLInputElement
+              if (input.value.trim()) {
+                sendMessage(input.value)
+                input.value = ''
+              }
+            }}
+            className='p-3 border-t'
+          >
+            <div className='flex gap-2'>
+              <input
+                type='text'
+                name='message'
+                placeholder='Type a message...'
+                className='flex-1 p-2 border rounded text-sm'
+                autoComplete='off'
+              />
+              <button type='submit' className='bg-blue-500 text-white px-4 py-2 rounded text-sm'>
+                Send
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Replace original content with items grid */}
       <div className='min-h-screen bg-white py-16 px-8'>
         <div className='max-w-3xl mx-auto'>
           <div className='grid grid-cols-3 gap-6'>
