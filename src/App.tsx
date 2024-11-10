@@ -32,6 +32,7 @@ export default function App() {
   const [selectedSizes, setSelectedSizes] = useState<Record<number, number>>({})
   const [selectedColors, setSelectedColors] = useState<Record<number, string>>({})
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
+  const [selectedImage, setSelectedImage] = useState<number | null>(null)
 
   useEffect(() => {
     setStatus({ online: true, lastSeen: Date.now() })
@@ -101,31 +102,26 @@ export default function App() {
       <main className='flex-1 p-6'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-12'>
           {/* Product Image Grid */}
-          <div className='grid grid-cols-2 gap-4 h-fit'>
+          <div className='grid'>
             {products.map((product) => (
               <div
                 key={product.id}
-                className={`relative group ${product.id === 1 || product.id === 4 ? 'col-span-2' : ''}`}
+                className={`relative ${product.id === 1 || product.id === 4 ? 'col-span-2' : ''}`}
                 onMouseEnter={() => setHoveredProduct(product.id)}
                 onMouseLeave={() => setHoveredProduct(null)}
+                onClick={() => setSelectedImage(selectedImage === product.id ? null : product.id)}
               >
                 <div className='aspect-square flex items-center justify-center'>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{
-                      width: '25%',
-                      height: 'auto',
-                      display: 'block',
-                    }}
-                    className='object-contain'
-                  />
+                  <div className={`w-[30%] transition-transform duration-200 ${selectedImage === product.id ? 'scale-105' : ''}`}>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className={`w-full h-auto object-contain transition-all duration-200 ${
+                        hoveredProduct && hoveredProduct !== product.id ? 'grayscale opacity-50' : ''
+                      }`}
+                    />
+                  </div>
                 </div>
-                <div
-                  className={`absolute inset-0 bg-black/40 transition-opacity ${
-                    hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
               </div>
             ))}
           </div>
@@ -133,7 +129,12 @@ export default function App() {
           {/* Product Details List */}
           <div className='space-y-8'>
             {products.map((product) => (
-              <div key={product.id} className='border-t border-border pt-4'>
+              <div
+                key={product.id}
+                className={`border-t border-border pt-4 transition-opacity duration-200 ${
+                  hoveredProduct && hoveredProduct !== product.id ? 'opacity-50' : ''
+                }`}
+              >
                 <div className='flex justify-between items-start'>
                   <div>
                     <h3 className='text-sm'>
